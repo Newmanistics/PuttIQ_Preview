@@ -1,0 +1,323 @@
+Incident Identifier: 6E9C9D23-5E40-4864-B4C4-E3DB23ECCC1D
+Distributor ID:      com.apple.TestFlight
+Hardware Model:      iPhone16,2
+Process:             PuttIQ [13493]
+Path:                /private/var/containers/Bundle/Application/773A91F7-2645-4D82-A344-AB526232F269/PuttIQ.app/PuttIQ
+Identifier:          com.puttiq.app
+Version:             1.1.0 (1)
+AppStoreTools:       17A323
+AppVariant:          1:iPhone16,2:18
+Beta:                YES
+Code Type:           ARM-64 (Native)
+Role:                Foreground
+Parent Process:      launchd [1]
+Coalition:           com.puttiq.app [4245]
+
+Date/Time:           2025-10-15 08:51:17.7347 +0100
+Launch Time:         2025-10-15 08:51:01.2078 +0100
+OS Version:          iPhone OS 18.6.2 (22G100)
+Release Type:        User
+Baseband Version:    2.70.02
+Report Version:      104
+
+Exception Type:  EXC_CRASH (SIGABRT)
+Exception Codes: 0x0000000000000000, 0x0000000000000000
+Termination Reason: SIGNAL 6 Abort trap: 6
+Terminating Process: PuttIQ [13493]
+
+Triggered by Thread:  19
+
+
+Thread 0 name:
+Thread 0:
+0   libsystem_kernel.dylib        	0x00000001ed5a1ce4 mach_msg2_trap + 8 (:-1)
+1   libsystem_kernel.dylib        	0x00000001ed5a539c mach_msg2_internal + 76 (mach_msg.c:201)
+2   libsystem_kernel.dylib        	0x00000001ed5a52b8 mach_msg_overwrite + 428 (mach_msg.c:0)
+3   libsystem_kernel.dylib        	0x00000001ed5a5100 mach_msg + 24 (mach_msg.c:323)
+4   CoreFoundation                	0x000000019c7477a0 __CFRunLoopServiceMachPort + 160 (CFRunLoop.c:2637)
+5   CoreFoundation                	0x000000019c746090 __CFRunLoopRun + 1208 (CFRunLoop.c:3021)
+6   CoreFoundation                	0x000000019c747adc CFRunLoopRunSpecific + 572 (CFRunLoop.c:3434)
+7   GraphicsServices              	0x00000001e956d454 GSEventRunModal + 168 (GSEvent.c:2196)
+8   UIKitCore                     	0x000000019f169274 -[UIApplication _run] + 816 (UIApplication.m:3845)
+9   UIKitCore                     	0x000000019f134a28 UIApplicationMain + 336 (UIApplication.m:5540)
+10  PuttIQ                        	0x0000000100325578 0x100320000 + 21880
+11  dyld                          	0x00000001c31d9f08 start + 6040 (dyldMain.cpp:1450)
+
+Thread 1:
+0   libsystem_pthread.dylib       	0x0000000226bf0aa4 start_wqthread + 0 (:-1)
+
+Thread 2:
+0   libsystem_pthread.dylib       	0x0000000226bf0aa4 start_wqthread + 0 (:-1)
+
+Thread 3 name:
+Thread 3:
+0   libsystem_kernel.dylib        	0x00000001ed5a1ce4 mach_msg2_trap + 8 (:-1)
+1   libsystem_kernel.dylib        	0x00000001ed5a539c mach_msg2_internal + 76 (mach_msg.c:201)
+2   libsystem_kernel.dylib        	0x00000001ed5a52b8 mach_msg_overwrite + 428 (mach_msg.c:0)
+3   libsystem_kernel.dylib        	0x00000001ed5a5100 mach_msg + 24 (mach_msg.c:323)
+4   CoreFoundation                	0x000000019c7477a0 __CFRunLoopServiceMachPort + 160 (CFRunLoop.c:2637)
+5   CoreFoundation                	0x000000019c746090 __CFRunLoopRun + 1208 (CFRunLoop.c:3021)
+6   CoreFoundation                	0x000000019c747adc CFRunLoopRunSpecific + 572 (CFRunLoop.c:3434)
+7   Foundation                    	0x000000019b3be79c -[NSRunLoop(NSRunLoop) runMode:beforeDate:] + 212 (NSRunLoop.m:375)
+8   Foundation                    	0x000000019b3c4020 -[NSRunLoop(NSRunLoop) runUntilDate:] + 64 (NSRunLoop.m:422)
+9   UIKitCore                     	0x000000019f15356c -[UIEventFetcher threadMain] + 424 (UIEventFetcher.m:1351)
+10  Foundation                    	0x000000019b424804 __NSThread__start__ + 732 (NSThread.m:991)
+11  libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+12  libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+Thread 4:
+0   libsystem_pthread.dylib       	0x0000000226bf0aa4 start_wqthread + 0 (:-1)
+
+Thread 5 name:
+Thread 5:
+0   libsystem_kernel.dylib        	0x00000001ed5a1ce4 mach_msg2_trap + 8 (:-1)
+1   libsystem_kernel.dylib        	0x00000001ed5a539c mach_msg2_internal + 76 (mach_msg.c:201)
+2   libsystem_kernel.dylib        	0x00000001ed5a52b8 mach_msg_overwrite + 428 (mach_msg.c:0)
+3   libsystem_kernel.dylib        	0x00000001ed5a5100 mach_msg + 24 (mach_msg.c:323)
+4   CoreFoundation                	0x000000019c7477a0 __CFRunLoopServiceMachPort + 160 (CFRunLoop.c:2637)
+5   CoreFoundation                	0x000000019c746090 __CFRunLoopRun + 1208 (CFRunLoop.c:3021)
+6   CoreFoundation                	0x000000019c747adc CFRunLoopRunSpecific + 572 (CFRunLoop.c:3434)
+7   React                         	0x0000000101aa4ea0 +[RCTJSThreadManager runRunLoop] + 252
+8   Foundation                    	0x000000019b424804 __NSThread__start__ + 732 (NSThread.m:991)
+9   libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+10  libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+Thread 6 name:
+Thread 6:
+0   libsystem_kernel.dylib        	0x00000001ed5a7438 __psynch_cvwait + 8 (:-1)
+1   libsystem_pthread.dylib       	0x0000000226bf1e50 _pthread_cond_wait + 984 (pthread_cond.c:862)
+2   libc++.1.dylib                	0x00000001ad0be294 std::__1::condition_variable::wait(std::__1::unique_lock<std::__1::mutex>&) + 32 (condition_variable.cpp:30)
+3   hermes                        	0x00000001013bf9c4 hermes::vm::HadesGC::Executor::worker() + 116 (:-1)
+4   hermes                        	0x00000001013bf92c void* std::__1::__thread_proxy[abi:nn180100]<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct>>, hermes::vm::HadesGC::Executor::Exe... + 44 (:-1)
+5   libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+6   libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+Thread 7 name:
+Thread 7:
+0   libsystem_kernel.dylib        	0x00000001ed5a1ce4 mach_msg2_trap + 8 (:-1)
+1   libsystem_kernel.dylib        	0x00000001ed5a539c mach_msg2_internal + 76 (mach_msg.c:201)
+2   libsystem_kernel.dylib        	0x00000001ed5a52b8 mach_msg_overwrite + 428 (mach_msg.c:0)
+3   libsystem_kernel.dylib        	0x00000001ed5a5100 mach_msg + 24 (mach_msg.c:323)
+4   CoreFoundation                	0x000000019c7477a0 __CFRunLoopServiceMachPort + 160 (CFRunLoop.c:2637)
+5   CoreFoundation                	0x000000019c746090 __CFRunLoopRun + 1208 (CFRunLoop.c:3021)
+6   CoreFoundation                	0x000000019c747adc CFRunLoopRunSpecific + 572 (CFRunLoop.c:3434)
+7   CFNetwork                     	0x000000019dd75db8 +[__CFN_CoreSchedulingSetRunnable _run:] + 416 (CoreSchedulingSet.mm:1473)
+8   Foundation                    	0x000000019b424804 __NSThread__start__ + 732 (NSThread.m:991)
+9   libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+10  libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+Thread 8:
+0   libsystem_pthread.dylib       	0x0000000226bf0aa4 start_wqthread + 0 (:-1)
+
+Thread 9:
+0   libsystem_pthread.dylib       	0x0000000226bf0aa4 start_wqthread + 0 (:-1)
+
+Thread 10 name:
+Thread 10:
+0   libsystem_kernel.dylib        	0x00000001ed5a1c78 semaphore_timedwait_trap + 8 (:-1)
+1   libdispatch.dylib             	0x00000001a47071c0 _dispatch_sema4_timedwait + 64 (lock.c:154)
+2   libdispatch.dylib             	0x00000001a46d4e58 _dispatch_semaphore_wait_slow + 76 (semaphore.c:116)
+3   libdispatch.dylib             	0x00000001a46e4ba8 _dispatch_worker_thread + 324 (queue.c:7520)
+4   libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+5   libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+Thread 11 name:
+Thread 11:
+0   libsystem_kernel.dylib        	0x00000001ed5a1c78 semaphore_timedwait_trap + 8 (:-1)
+1   libdispatch.dylib             	0x00000001a47071c0 _dispatch_sema4_timedwait + 64 (lock.c:154)
+2   libdispatch.dylib             	0x00000001a46d4e58 _dispatch_semaphore_wait_slow + 76 (semaphore.c:116)
+3   libdispatch.dylib             	0x00000001a46e4ba8 _dispatch_worker_thread + 324 (queue.c:7520)
+4   libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+5   libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+Thread 12 name:
+Thread 12:
+0   libsystem_kernel.dylib        	0x00000001ed5a1c78 semaphore_timedwait_trap + 8 (:-1)
+1   libdispatch.dylib             	0x00000001a47071c0 _dispatch_sema4_timedwait + 64 (lock.c:154)
+2   libdispatch.dylib             	0x00000001a46d4e58 _dispatch_semaphore_wait_slow + 76 (semaphore.c:116)
+3   libdispatch.dylib             	0x00000001a46e4ba8 _dispatch_worker_thread + 324 (queue.c:7520)
+4   libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+5   libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+Thread 13 name:
+Thread 13:
+0   libsystem_kernel.dylib        	0x00000001ed5a1c78 semaphore_timedwait_trap + 8 (:-1)
+1   libdispatch.dylib             	0x00000001a47071c0 _dispatch_sema4_timedwait + 64 (lock.c:154)
+2   libdispatch.dylib             	0x00000001a46d4e58 _dispatch_semaphore_wait_slow + 76 (semaphore.c:116)
+3   libdispatch.dylib             	0x00000001a46e4ba8 _dispatch_worker_thread + 324 (queue.c:7520)
+4   libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+5   libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+Thread 14:
+0   libsystem_pthread.dylib       	0x0000000226bf0aa4 start_wqthread + 0 (:-1)
+
+Thread 15:
+0   libsystem_pthread.dylib       	0x0000000226bf0aa4 start_wqthread + 0 (:-1)
+
+Thread 16:
+0   libsystem_pthread.dylib       	0x0000000226bf0aa4 start_wqthread + 0 (:-1)
+
+Thread 17 name:
+Thread 17:
+0   libsystem_kernel.dylib        	0x00000001ed5a1c78 semaphore_timedwait_trap + 8 (:-1)
+1   libdispatch.dylib             	0x00000001a47071c0 _dispatch_sema4_timedwait + 64 (lock.c:154)
+2   libdispatch.dylib             	0x00000001a46d4e58 _dispatch_semaphore_wait_slow + 76 (semaphore.c:116)
+3   libdispatch.dylib             	0x00000001a46e4ba8 _dispatch_worker_thread + 324 (queue.c:7520)
+4   libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+5   libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+Thread 18 name:
+Thread 18:
+0   libsystem_kernel.dylib        	0x00000001ed5a1ce4 mach_msg2_trap + 8 (:-1)
+1   libsystem_kernel.dylib        	0x00000001ed5a539c mach_msg2_internal + 76 (mach_msg.c:201)
+2   libsystem_kernel.dylib        	0x00000001ed5a52b8 mach_msg_overwrite + 428 (mach_msg.c:0)
+3   libsystem_kernel.dylib        	0x00000001ed5a5100 mach_msg + 24 (mach_msg.c:323)
+4   libEmbeddedSystemAUs.dylib    	0x0000000234fd458c __AURIOCallbackReceiver_IOFormatsChanged_block_invoke + 568 (AURemoteIO.cpp:2362)
+5   libdispatch.dylib             	0x00000001a46d2aac _dispatch_call_block_and_release + 32 (init.c:1575)
+6   libdispatch.dylib             	0x00000001a46ec584 _dispatch_client_callout + 16 (client_callout.mm:85)
+7   libdispatch.dylib             	0x00000001a46db2d0 _dispatch_lane_serial_drain + 740 (queue.c:3939)
+8   libdispatch.dylib             	0x00000001a46dbdac _dispatch_lane_invoke + 388 (queue.c:4030)
+9   libdispatch.dylib             	0x00000001a46e61dc _dispatch_root_queue_drain_deferred_wlh + 292 (queue.c:7198)
+10  libdispatch.dylib             	0x00000001a46e5a60 _dispatch_workloop_worker_thread + 540 (queue.c:6792)
+11  libsystem_pthread.dylib       	0x0000000226bf0a0c _pthread_wqthread + 292 (pthread.c:2696)
+12  libsystem_pthread.dylib       	0x0000000226bf0aac start_wqthread + 8 (:-1)
+
+Thread 19 name:
+Thread 19 Crashed:
+0   libsystem_kernel.dylib        	0x00000001ed5ac1dc __pthread_kill + 8 (:-1)
+1   libsystem_pthread.dylib       	0x0000000226bf7c60 pthread_kill + 268 (pthread.c:1721)
+2   libsystem_c.dylib             	0x00000001a478e0ac abort + 124 (abort.c:122)
+3   libc++abi.dylib               	0x0000000226b215a0 abort_message + 132 (abort_message.cpp:78)
+4   libc++abi.dylib               	0x0000000226b0ff10 demangling_terminate_handler() + 344 (cxa_default_handlers.cpp:77)
+5   libobjc.A.dylib               	0x0000000199cebbf8 _objc_terminate() + 156 (objc-exception.mm:496)
+6   libc++abi.dylib               	0x0000000226b208b4 std::__terminate(void (*)()) + 16 (cxa_handlers.cpp:59)
+7   libc++abi.dylib               	0x0000000226b240d0 __cxa_rethrow + 188 (cxa_exception.cpp:658)
+8   libobjc.A.dylib               	0x0000000199ce9568 objc_exception_rethrow + 44 (objc-exception.mm:399)
+9   AVFAudio                      	0x00000001b7d1a180 AUGraphNodeBaseV3::CreateRecordingTap(unsigned long, unsigned int, AVAudioFormat*, void (AVAudioPCMBuffer*, AVAudioTime*) block_pointer) + 1204 (AVAEGraphNode.mm:843)
+10  AVFAudio                      	0x00000001b7dc8f48 AVAudioEngineImpl::InstallTapOnNode(AVAudioNode*, unsigned long, unsigned int, AVAudioFormat*, void (AVAudioPCMBuffer*, AVAudioTime*) block_pointer) + 1196 (AVAudioEngine.mm:1534)
+11  AVFAudio                      	0x00000001b7d9ea14 -[AVAudioNode installTapOnBus:bufferSize:format:block:] + 564 (AVAudioNode.mm:186)
+12  PuttIQ                        	0x000000010043f06c 0x100320000 + 1175660
+13  PuttIQ                        	0x0000000100444bac 0x100320000 + 1199020
+14  PuttIQ                        	0x0000000100444e74 0x100320000 + 1199732
+15  PuttIQ                        	0x0000000100373c58 0x100320000 + 343128
+16  PuttIQ                        	0x0000000100373cc0 0x100320000 + 343232
+17  PuttIQ                        	0x00000001003714b8 0x100320000 + 332984
+18  PuttIQ                        	0x000000010037201c 0x100320000 + 335900
+19  PuttIQ                        	0x0000000100329e78 0x100320000 + 40568
+20  libdispatch.dylib             	0x00000001a46d2aac _dispatch_call_block_and_release + 32 (init.c:1575)
+21  libdispatch.dylib             	0x00000001a46ec584 _dispatch_client_callout + 16 (client_callout.mm:85)
+22  libdispatch.dylib             	0x00000001a46db2d0 _dispatch_lane_serial_drain + 740 (queue.c:3939)
+23  libdispatch.dylib             	0x00000001a46dbdac _dispatch_lane_invoke + 388 (queue.c:4030)
+24  libdispatch.dylib             	0x00000001a46e61dc _dispatch_root_queue_drain_deferred_wlh + 292 (queue.c:7198)
+25  libdispatch.dylib             	0x00000001a46e5a60 _dispatch_workloop_worker_thread + 540 (queue.c:6792)
+26  libsystem_pthread.dylib       	0x0000000226bf0a0c _pthread_wqthread + 292 (pthread.c:2696)
+27  libsystem_pthread.dylib       	0x0000000226bf0aac start_wqthread + 8 (:-1)
+
+Thread 20 name:
+Thread 20:
+0   libsystem_kernel.dylib        	0x00000001ed5a1c78 semaphore_timedwait_trap + 8 (:-1)
+1   libdispatch.dylib             	0x00000001a47071c0 _dispatch_sema4_timedwait + 64 (lock.c:154)
+2   libdispatch.dylib             	0x00000001a46d4e58 _dispatch_semaphore_wait_slow + 76 (semaphore.c:116)
+3   libdispatch.dylib             	0x00000001a46e4ba8 _dispatch_worker_thread + 324 (queue.c:7520)
+4   libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+5   libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+Thread 21 name:
+Thread 21:
+0   libsystem_kernel.dylib        	0x00000001ed5a1c78 semaphore_timedwait_trap + 8 (:-1)
+1   libdispatch.dylib             	0x00000001a47071c0 _dispatch_sema4_timedwait + 64 (lock.c:154)
+2   libdispatch.dylib             	0x00000001a46d4e58 _dispatch_semaphore_wait_slow + 76 (semaphore.c:116)
+3   libdispatch.dylib             	0x00000001a46e4ba8 _dispatch_worker_thread + 324 (queue.c:7520)
+4   libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+5   libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+Thread 22 name:
+Thread 22 name:
+Thread 22:
+0   libsystem_kernel.dylib        	0x00000001ed5a1ce4 mach_msg2_trap + 8 (:-1)
+1   libsystem_kernel.dylib        	0x00000001ed5a539c mach_msg2_internal + 76 (mach_msg.c:201)
+2   libsystem_kernel.dylib        	0x00000001ed5a52b8 mach_msg_overwrite + 428 (mach_msg.c:0)
+3   libsystem_kernel.dylib        	0x00000001ed5a5100 mach_msg + 24 (mach_msg.c:323)
+4   libdispatch.dylib             	0x00000001a46edc08 _dispatch_mach_send_and_wait_for_reply + 548 (mach.c:1997)
+5   libdispatch.dylib             	0x00000001a46edfa8 dispatch_mach_send_with_result_and_wait_for_reply + 60 (mach.c:2034)
+6   libxpc.dylib                  	0x0000000226c4b7f0 xpc_connection_send_message_with_reply_sync + 256 (connection.c:4111)
+7   Foundation                    	0x000000019b40a9b0 __NSXPCCONNECTION_IS_WAITING_FOR_A_SYNCHRONOUS_REPLY__ + 16 (NSXPCConnection.m:223)
+8   Foundation                    	0x000000019b3c588c -[NSXPCConnection _sendInvocation:orArguments:count:methodSignature:selector:withProxy:] + 2100 (NSXPCConnection.m:1673)
+9   CoreFoundation                	0x000000019c7646cc ___forwarding___ + 996 (NSForwarding.m:3646)
+10  CoreFoundation                	0x000000019c764940 _CF_forwarding_prep_0 + 96 (:-1)
+11  AudioSession                  	0x00000001bba05500 as::client::api_utils::ServerAccessor::GetBatchPropertiesMX(NSArray<NSString*>*, NSDictionary<NSString*, NSNumber*>* __autoreleasing*) const + 304 (SessionAPIUtilities.mm:226)
+12  AudioSession                  	0x00000001bba05920 -[AVAudioSession(GenericPipe) getMXProperties:propertyErrors:] + 88 (AVAudioSessionClient_Common.mm:702)
+13  AudioSession                  	0x00000001bba050b8 as::client::cache_util::CacheManager::refreshCachedProperty(AVAudioSession*, NSString*) + 168 (AVAudioSessionCachingUtils.mm:263)
+14  AudioSession                  	0x00000001bb9fd880 as::client::cache_util::CacheManager::checkAndRefreshCacheForNotification(AVAudioSession*, NSString*) + 300 (AVAudioSessionCachingUtils.mm:223)
+15  AudioSession                  	0x00000001bb9fcbc4 -[AVAudioSession handleDeferredMessage:userInfo:] + 128 (AVAudioSession_iOS.mm:759)
+16  AudioSession                  	0x00000001bb9fb4a0 -[AVAudioSession(ClientCommonImplementation) privateHandlePing] + 772 (AVAudioSessionClient_Common.mm:154)
+17  AudioSession                  	0x00000001bb9fb164 __66-[AVAudioSession(ClientCommonImplementation) privateDispatchPing:]_block_invoke + 44 (AVAudioSessionClient_Common.mm:174)
+18  libdispatch.dylib             	0x00000001a46d2aac _dispatch_call_block_and_release + 32 (init.c:1575)
+19  libdispatch.dylib             	0x00000001a46ec584 _dispatch_client_callout + 16 (client_callout.mm:85)
+20  libdispatch.dylib             	0x00000001a46db2d0 _dispatch_lane_serial_drain + 740 (queue.c:3939)
+21  libdispatch.dylib             	0x00000001a46dbde0 _dispatch_lane_invoke + 440 (queue.c:4030)
+22  libdispatch.dylib             	0x00000001a46e4db0 _dispatch_root_queue_drain + 364 (queue.c:7342)
+23  libdispatch.dylib             	0x00000001a46e4b70 _dispatch_worker_thread + 268 (queue.c:7517)
+24  libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+25  libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+Thread 23 name:
+Thread 23:
+0   libsystem_kernel.dylib        	0x00000001ed5a1c60 semaphore_wait_trap + 8 (:-1)
+1   caulk                         	0x000000022a07d9e4 caulk::semaphore::timed_wait(double) + 224 (semaphore.cpp:98)
+2   caulk                         	0x000000022a07c020 caulk::concurrent::details::worker_thread::run() + 32 (messenger.cpp:236)
+3   caulk                         	0x000000022a092ee0 void* caulk::thread_proxy<std::__1::tuple<caulk::thread::attributes, void (caulk::concurrent::details::worker_thread::*)(), std::__1::tuple<caulk::concurrent::details::worker_thread*>>>(void*) + 96 (thread.h:197)
+4   libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+5   libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+Thread 24 name:
+Thread 24:
+0   libsystem_kernel.dylib        	0x00000001ed5a1c60 semaphore_wait_trap + 8 (:-1)
+1   caulk                         	0x000000022a07d9e4 caulk::semaphore::timed_wait(double) + 224 (semaphore.cpp:98)
+2   caulk                         	0x000000022a07c020 caulk::concurrent::details::worker_thread::run() + 32 (messenger.cpp:236)
+3   caulk                         	0x000000022a092ee0 void* caulk::thread_proxy<std::__1::tuple<caulk::thread::attributes, void (caulk::concurrent::details::worker_thread::*)(), std::__1::tuple<caulk::concurrent::details::worker_thread*>>>(void*) + 96 (thread.h:197)
+4   libsystem_pthread.dylib       	0x0000000226bf3344 _pthread_start + 136 (pthread.c:931)
+5   libsystem_pthread.dylib       	0x0000000226bf0ab8 thread_start + 8 (:-1)
+
+
+Thread 19 crashed with ARM Thread State (64-bit):
+    x0: 0x0000000000000000   x1: 0x0000000000000000   x2: 0x0000000000000000   x3: 0x0000000000000000
+    x4: 0x0000000226b25fdb   x5: 0x000000017053dd70   x6: 0x000000000000006e   x7: 0x6206dcc52c982583
+    x8: 0x388d142dc5763e74   x9: 0x388d142cb525ce74  x10: 0x0000000000000051  x11: 0x000000000000000b
+   x12: 0x000000000000000b  x13: 0x000000019cbf1494  x14: 0x0000000000000001  x15: 0xffffffffb00007ff
+   x16: 0x0000000000000148  x17: 0x000000017053f000  x18: 0x0000000000000000  x19: 0x0000000000000006
+   x20: 0x000000000000f707  x21: 0x000000017053f0e0  x22: 0x434c4e47432b2b00  x23: 0x000000010c228b90
+   x24: 0x0000000117450300  x25: 0x0000000200aae000  x26: 0x00000002053a5000  x27: 0x00000002053a5000
+   x28: 0x00000002053a5000   fp: 0x000000017053dce0   lr: 0x0000000226bf7c60
+    sp: 0x000000017053dcc0   pc: 0x00000001ed5ac1dc cpsr: 0x40001000
+   esr: 0x56000080  Address size fault
+
+
+Binary Images:
+        0x100320000 -         0x10077ffff PuttIQ arm64  <1664aa881c58390ba7041e72effcb307> /var/containers/Bundle/Application/773A91F7-2645-4D82-A344-AB526232F269/PuttIQ.app/PuttIQ
+        0x100934000 -         0x10093ffff libobjc-trampolines.dylib arm64e  <def9fca06da1332796903b879ffc755c> /private/preboot/Cryptexes/OS/usr/lib/libobjc-trampolines.dylib
+        0x100998000 -         0x1009abfff GAXClient arm64e  <05e854b33dc33ff6bfbea66fdd9d15c9> /System/Library/AccessibilityBundles/GAXClient.bundle/GAXClient
+        0x100cf8000 -         0x100d7ffff ReactNativeDependencies arm64  <b35f1182b82e33728a74a4fe502c0906> /private/var/containers/Bundle/Application/773A91F7-2645-4D82-A344-AB526232F269/PuttIQ.app/Frameworks/ReactNativeDependencies.framework/ReactNativeDependencies
+        0x1012f0000 -         0x1014f3fff hermes arm64  <ba3c949a77073472b346d3e0690c88d0> /private/var/containers/Bundle/Application/773A91F7-2645-4D82-A344-AB526232F269/PuttIQ.app/Frameworks/hermes.framework/hermes
+        0x101804000 -         0x101c3ffff React arm64  <d636736195903fe5bbab2a3ad49a83e8> /private/var/containers/Bundle/Application/773A91F7-2645-4D82-A344-AB526232F269/PuttIQ.app/Frameworks/React.framework/React
+        0x102d18000 -         0x10365ffff WebRTC arm64  <4c4c445c55553144a162bd17e1270d40> /private/var/containers/Bundle/Application/773A91F7-2645-4D82-A344-AB526232F269/PuttIQ.app/Frameworks/WebRTC.framework/WebRTC
+        0x199cb8000 -         0x199d09bb3 libobjc.A.dylib arm64e  <e8825548d1483ee2807639ea9cb11129> /usr/lib/libobjc.A.dylib
+        0x19b3af000 -         0x19c02305f Foundation arm64e  <c031896b2ef13d89966a0b52d54bceee> /System/Library/Frameworks/Foundation.framework/Foundation
+        0x19c736000 -         0x19ccb2fff CoreFoundation arm64e  <ae3c93380166397a9643356b14f6ee58> /System/Library/Frameworks/CoreFoundation.framework/CoreFoundation
+        0x19dcd6000 -         0x19e09b35f CFNetwork arm64e  <271cab2fd622384c8a7f2b5857119e0d> /System/Library/Frameworks/CFNetwork.framework/CFNetwork
+        0x19f034000 -         0x1a0f7655f UIKitCore arm64e  <5e794caa41623ff6861e45f29f6b8ac0> /System/Library/PrivateFrameworks/UIKitCore.framework/UIKitCore
+        0x1a46d1000 -         0x1a4716b3f libdispatch.dylib arm64e  <b62778f758273a7ba96da24f7be95416> /usr/lib/system/libdispatch.dylib
+        0x1a4717000 -         0x1a47966c3 libsystem_c.dylib arm64e  <335cd87d234b3fc182db943350d31a88> /usr/lib/system/libsystem_c.dylib
+        0x1ad09d000 -         0x1ad12cff7 libc++.1.dylib arm64e  <2fbf38d8e5a53ffe9f8736a797ea4cdb> /usr/lib/libc++.1.dylib
+        0x1b7cb7000 -         0x1b7e2bfdf AVFAudio arm64e  <c36ff7cee4cb3354b42aa88c397843e4> /System/Library/Frameworks/AVFAudio.framework/AVFAudio
+        0x1bb9f8000 -         0x1bba5771f AudioSession arm64e  <f3cd1fcaeb17326a830fb62e0b851903> /System/Library/PrivateFrameworks/AudioSession.framework/AudioSession
+        0x1c319b000 -         0x1c323587b dyld arm64e  <cd2e758de1a23b92aae775d38f66ec54> /usr/lib/dyld
+        0x1e956c000 -         0x1e9574c7f GraphicsServices arm64e  <d372e13f75053addae13062656f0b1f6> /System/Library/PrivateFrameworks/GraphicsServices.framework/GraphicsServices
+        0x1ed5a1000 -         0x1ed5daebf libsystem_kernel.dylib arm64e  <a9a7ecbd24dd37e6bb23ecbfd9a87e33> /usr/lib/system/libsystem_kernel.dylib
+        0x226b0b000 -         0x226b28fff libc++abi.dylib arm64e  <b5a6eccef205302a8874755a0e3ad747> /usr/lib/libc++abi.dylib
+        0x226bf0000 -         0x226bfc3f3 libsystem_pthread.dylib arm64e  <1ee1922008593cbcbdebdf37ca2e8e4f> /usr/lib/system/libsystem_pthread.dylib
+        0x226c3b000 -         0x226c82dbf libxpc.dylib arm64e  <6e4f2f21192a30e8a3ad9915add1ebd2> /usr/lib/system/libxpc.dylib
+        0x22a07a000 -         0x22a0a1e7f caulk arm64e  <2d837b5b6b9737afb448acf71af422f6> /System/Library/PrivateFrameworks/caulk.framework/caulk
+        0x234f1d000 -         0x23503349b libEmbeddedSystemAUs.dylib arm64e  <c732dfe3dc003a47838f31952c7daca3> /System/Library/Frameworks/AudioToolbox.framework/libEmbeddedSystemAUs.dylib
+
+EOF
