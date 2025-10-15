@@ -4,7 +4,7 @@ import { View, Image, Text, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { Asset } from 'expo-asset';
-import { Audio } from 'expo-av';
+import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
 import HomeScreen from './screens/HomeScreen';
 import { authenticateUser } from './services/auth';
 
@@ -57,6 +57,21 @@ export default function App() {
         } catch (permErr) {
           console.warn('Could not request microphone permission:', permErr);
           // Non-critical - user can still use app without Listen Mode
+        }
+
+        try {
+          await Audio.setAudioModeAsync({
+            allowsRecordingIOS: false,
+            playsInSilentModeIOS: true,
+            staysActiveInBackground: true,
+            interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
+            interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
+            shouldDuckAndroid: false,
+            playThroughEarpieceAndroid: false,
+          });
+          console.log('Audio mode configured for foreground playback');
+        } catch (audioModeError) {
+          console.warn('Failed to configure audio mode:', audioModeError);
         }
 
         // Ensure minimum 2.5 seconds loading time

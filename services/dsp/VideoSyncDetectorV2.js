@@ -14,6 +14,16 @@
 import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
 import { Platform } from 'react-native';
 
+let ExpoPlayAudioStream = null;
+try {
+  const audioStreamModule = require('@cjblack/expo-audio-stream');
+  ExpoPlayAudioStream = audioStreamModule?.ExpoPlayAudioStream ?? null;
+} catch (error) {
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    console.log('Expo audio stream module unavailable:', error?.message ?? error);
+  }
+}
+
 export class VideoSyncDetectorV2 {
   constructor(options = {}) {
     // Configuration
@@ -61,6 +71,10 @@ export class VideoSyncDetectorV2 {
     // Performance tracking
     this.frameCount = 0;
     this.startTime = 0;
+
+    // Audio stream integration
+    this.usingAudioStream = false;
+    this.audioStreamSubscription = null;
 
     // Loop detection
     this.lastVideoPosition = 0;         // Track position to detect loop restart
@@ -286,8 +300,6 @@ export class VideoSyncDetectorV2 {
         return;
       }
 
-      const now = performance.now();
-
       // Get metering level (dB) and convert to linear scale
       let meteringLinear = 0;
       if (status.metering !== undefined && status.metering !== null) {
@@ -295,117 +307,184 @@ export class VideoSyncDetectorV2 {
         meteringLinear = Math.pow(10, meteringDb / 20);
       }
 
-      // Update baseline during 2-second gap OR during first loop (before any gap has occurred)
-      // After first gap, lock to gap-only updates to prevent video audio pollution
-      if (this.isInGap || this.isFirstLoop) {
-        this.updateBaseline(meteringLinear);
-      }
-
-      // Check for energy spike above threshold
-      const baseThreshold = this.baselineEnergy * this.opts.energyThreshold;
-      const threshold = Math.min(Math.max(0.01, baseThreshold), 0.5);
-      const isSpike = meteringLinear > threshold;
-
-      // Track spikes over 4x for debugging (helps identify putter hits)
-      const ratio = meteringLinear / (this.baselineEnergy + 0.0001);
-      const is4xSpike = ratio >= 4.0;
-      const timeSinceLastSpike = now - this.lastSpikeAt;
-      let currentSpikeNumber = null;
-
-      if (is4xSpike && timeSinceLastSpike > 100) {  // Debounce spikes by 100ms
-        this.spikeCount++;
-        this.lastSpikeAt = now;
-        currentSpikeNumber = this.spikeCount;
-
-        if (this.opts.debugMode) {
-          console.log(`🔥 SPIKE #${this.spikeCount}: ${ratio.toFixed(1)}x at ${(this.getVideoPosition() * 100).toFixed(1)}%`);
-        }
-      }
-
-      // Call audio level callback with current data (before any filtering)
-      if (this.opts.onAudioLevel) {
-        this.opts.onAudioLevel({
-          level: meteringLinear,
-          baseline: this.baselineEnergy,
-          threshold,
-          ratio,
-          isListening: this.isListening,
-          videoPosition: this.getVideoPosition(),
-          isAboveThreshold: isSpike,
-          spikeNumber: currentSpikeNumber  // Show spike number when over 4x
-        });
-      }
-
-      // Debounce check
-      const timeSinceLastHit = now - this.lastHitAt;
-      const debounceOk = timeSinceLastHit > this.opts.debounceMs;
-
-      // Log ALL significant audio activity
-      if (meteringLinear > this.baselineEnergy * 1.5) {
-        const wouldDetect = isSpike && debounceOk && this.isListening;
-        const rejectedReason = !isSpike ? 'Too quiet' :
-                               !debounceOk ? 'Debounce' :
-                               !this.isListening ? 'Not listening (before 3rd beat)' :
-                               'None';
-
-        console.log('🔊 AUDIO SPIKE:', {
-          level: meteringLinear.toFixed(6),
-          baseline: this.baselineEnergy.toFixed(6),
-          threshold: threshold.toFixed(6),
-          ratio: ratio.toFixed(2) + 'x',
-          listening: this.isListening,
-          videoPos: (this.getVideoPosition() * 100).toFixed(1) + '%',
-          wouldDetect,
-          reason: wouldDetect ? 'DETECTED ✅' : rejectedReason
-        });
-      }
-
-      if (isSpike && debounceOk && this.isListening) {
-        // Capture position IMMEDIATELY (synchronously with spike detection)
-        const captureTimestamp = performance.now();
-        const capturedPosition = this.getVideoPosition();
-        const videoTimestamp = this.opts.videoPlayer?.currentTime || 0;
-
-        // Update state
-        this.lastHitAt = now;
-        this.hitCount++;
-        this.hitDetectedThisLoop = true;  // Mark hit detected, stop listening for rest of loop
-
-        // Store in pending hits buffer for accurate processing
-        this.pendingHits.push({
-          captureTimestamp,
-          videoPosition: capturedPosition,
-          videoTimestamp,
-          audioLevel: meteringLinear,
-          baseline: this.baselineEnergy,
-          ratio,
-          hitNumber: this.hitCount
-        });
-
-        if (this.opts.debugMode) {
-          console.log(`🎯 HIT #${this.hitCount} CAPTURED at ${(capturedPosition * 100).toFixed(1)}% (will process in ${this.opts.hitProcessingDelayMs}ms)`, {
-            captureTime: captureTimestamp.toFixed(0) + 'ms',
-            videoTime: videoTimestamp.toFixed(3) + 's',
-            ratio: ratio.toFixed(1) + 'x'
-          });
-        }
-
-        // Hit will be processed by processPendingHits() after delay
-        // This ensures accurate position without affecting timing
-      }
-
-      // Debug logging
-      if (this.opts.debugMode && this.frameCount % 10 === 0) {
-        console.log(`📊 [${this.frameCount}] Audio: ${meteringLinear.toFixed(6)}, Baseline: ${this.baselineEnergy.toFixed(6)}, Threshold: ${threshold.toFixed(6)}, Listening: ${this.isListening}`);
-      }
-
-      this.frameCount++;
+      this.processMeteringSample(meteringLinear);
     } catch (error) {
       if (this.isRunning && this.opts.debugMode) {
         console.warn('Error processing audio:', error.message);
         console.warn('Error stack:', error.stack);
       }
     }
+  }
+
+  /**
+   * Convert base64 audio data to Int16Array
+   * @param {string} base64 - Base64 encoded audio payload
+   * @returns {Int16Array}
+   */
+  base64ToInt16Array(base64) {
+    const binaryString = atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    return new Int16Array(bytes.buffer);
+  }
+
+  /**
+   * Handle streaming audio callback from ExpoPlayAudioStream
+   * @param {Object} audioData - Data emitted from native stream
+   */
+  handleAudioStreamData(audioData) {
+    if (!this.isRunning) {
+      return;
+    }
+
+    const base64Audio = audioData?.data;
+    if (!base64Audio || typeof base64Audio !== 'string') {
+      if (this.opts.debugMode) {
+        console.warn('Invalid audio stream payload received');
+      }
+      return;
+    }
+
+    let samples;
+    try {
+      samples = this.base64ToInt16Array(base64Audio);
+    } catch (error) {
+      if (this.opts.debugMode) {
+        console.warn('Failed to decode audio stream chunk:', error?.message ?? error);
+      }
+      return;
+    }
+
+    if (!samples || samples.length === 0) {
+      return;
+    }
+
+    let sumSquares = 0;
+    const sampleCount = samples.length;
+    for (let i = 0; i < sampleCount; i++) {
+      const normalized = samples[i] / 32768;
+      sumSquares += normalized * normalized;
+    }
+
+    const meteringLinear = Math.sqrt(sumSquares / sampleCount) || 0;
+    this.processMeteringSample(meteringLinear);
+  }
+
+  /**
+   * Shared detection logic for metering samples
+   * @param {number} meteringLinear - Audio energy (0-1 linear scale)
+   */
+  processMeteringSample(meteringLinear) {
+    if (!this.isRunning) {
+      return;
+    }
+
+    if (!Number.isFinite(meteringLinear)) {
+      meteringLinear = 0;
+    }
+
+    const now = performance.now();
+
+    if (this.isInGap || this.isFirstLoop) {
+      this.updateBaseline(meteringLinear);
+    }
+
+    const baseThreshold = this.baselineEnergy * this.opts.energyThreshold;
+    const threshold = Math.min(Math.max(0.01, baseThreshold), 0.5);
+    const isSpike = meteringLinear > threshold;
+
+    const ratio = meteringLinear / (this.baselineEnergy + 0.0001);
+    const is4xSpike = ratio >= 4.0;
+    const timeSinceLastSpike = now - this.lastSpikeAt;
+    let currentSpikeNumber = null;
+
+    if (is4xSpike && timeSinceLastSpike > 100) {
+      this.spikeCount++;
+      this.lastSpikeAt = now;
+      currentSpikeNumber = this.spikeCount;
+
+      if (this.opts.debugMode) {
+        console.log(`🔥 SPIKE #${this.spikeCount}: ${ratio.toFixed(1)}x at ${(this.getVideoPosition() * 100).toFixed(1)}%`);
+      }
+    }
+
+    if (this.opts.onAudioLevel) {
+      this.opts.onAudioLevel({
+        level: meteringLinear,
+        baseline: this.baselineEnergy,
+        threshold,
+        ratio,
+        isListening: this.isListening && !this.isPaused,
+        videoPosition: this.getVideoPosition(),
+        isAboveThreshold: isSpike,
+        spikeNumber: currentSpikeNumber
+      });
+    }
+
+    if (this.isPaused) {
+      return;
+    }
+
+    const timeSinceLastHit = now - this.lastHitAt;
+    const debounceOk = timeSinceLastHit > this.opts.debounceMs;
+
+    if (meteringLinear > this.baselineEnergy * 1.5) {
+      const wouldDetect = isSpike && debounceOk && this.isListening;
+      const rejectedReason = !isSpike ? 'Too quiet' :
+                             !debounceOk ? 'Debounce' :
+                             !this.isListening ? 'Not listening (before 3rd beat)' :
+                             'None';
+
+      console.log('🔊 AUDIO SPIKE:', {
+        level: meteringLinear.toFixed(6),
+        baseline: this.baselineEnergy.toFixed(6),
+        threshold: threshold.toFixed(6),
+        ratio: ratio.toFixed(2) + 'x',
+        listening: this.isListening,
+        videoPos: (this.getVideoPosition() * 100).toFixed(1) + '%',
+        wouldDetect,
+        reason: wouldDetect ? 'DETECTED ✅' : rejectedReason
+      });
+    }
+
+    if (isSpike && debounceOk && this.isListening) {
+      const captureTimestamp = performance.now();
+      const capturedPosition = this.getVideoPosition();
+      const videoTimestamp = this.opts.videoPlayer?.currentTime || 0;
+
+      this.lastHitAt = now;
+      this.hitCount++;
+      this.hitDetectedThisLoop = true;
+
+      this.pendingHits.push({
+        captureTimestamp,
+        videoPosition: capturedPosition,
+        videoTimestamp,
+        audioLevel: meteringLinear,
+        baseline: this.baselineEnergy,
+        ratio,
+        hitNumber: this.hitCount
+      });
+
+      if (this.opts.debugMode) {
+        console.log(`🎯 HIT #${this.hitCount} CAPTURED at ${(capturedPosition * 100).toFixed(1)}% (will process in ${this.opts.hitProcessingDelayMs}ms)`, {
+          captureTime: captureTimestamp.toFixed(0) + 'ms',
+          videoTime: videoTimestamp.toFixed(3) + 's',
+          ratio: ratio.toFixed(1) + 'x'
+        });
+      }
+    }
+
+    if (this.opts.debugMode && this.frameCount % 10 === 0) {
+      console.log(`📊 [${this.frameCount}] Audio: ${meteringLinear.toFixed(6)}, Baseline: ${this.baselineEnergy.toFixed(6)}, Threshold: ${threshold.toFixed(6)}, Listening: ${this.isListening}`);
+    }
+
+    this.frameCount++;
   }
 
   /**
@@ -500,8 +579,10 @@ export class VideoSyncDetectorV2 {
         }
       }
 
-      // Poll audio status
-      this.processAudioStatus();
+      // Poll audio status for recorder-based fallback
+      if (!this.usingAudioStream) {
+        this.processAudioStatus();
+      }
 
       // Process pending hits (delayed for accuracy)
       this.processPendingHits();
@@ -565,36 +646,64 @@ export class VideoSyncDetectorV2 {
         shouldDuckAndroid: false,
       });
 
-      // Create and start recording
-      this.recording = new Audio.Recording();
+      this.usingAudioStream = false;
+      this.recording = null;
 
-      const recordingOptions = {
-        isMeteringEnabled: true,
-        keepAudioActiveHint: true,
-        android: {
-          extension: '.m4a',
-          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
-          audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 44100,
-          numberOfChannels: 1,
-          bitRate: 128000,
-        },
-        ios: {
-          extension: '.m4a',
-          outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
-          audioQuality: Audio.IOSAudioQuality.HIGH,
-          sampleRate: 44100,
-          numberOfChannels: 1,
-          bitRate: 128000,
-        },
-        web: {
-          mimeType: 'audio/webm',
-          bitsPerSecond: 128000,
-        },
-      };
+      if (ExpoPlayAudioStream && typeof ExpoPlayAudioStream.startRecording === 'function') {
+        const streamConfig = {
+          sampleRate: this.opts.sampleRate,
+          channels: 1,
+          bitsPerChannel: 16,
+          interval: 100,
+          onAudioStream: (audioData) => {
+            this.handleAudioStreamData(audioData);
+          }
+        };
 
-      await this.recording.prepareToRecordAsync(recordingOptions);
-      await this.recording.startAsync();
+        try {
+          await ExpoPlayAudioStream.stopRecording();
+        } catch (e) {
+          // No-op if nothing to stop
+        }
+
+        const result = await ExpoPlayAudioStream.startRecording(streamConfig);
+        this.audioStreamSubscription = result?.subscription ?? null;
+        this.usingAudioStream = true;
+      } else {
+        if (Platform.OS === 'ios') {
+          throw new Error('Listen Mode requires the Expo audio stream module on iOS builds.');
+        }
+
+        this.recording = new Audio.Recording();
+
+        const recordingOptions = {
+          isMeteringEnabled: true,
+          keepAudioActiveHint: true,
+          android: {
+            extension: '.m4a',
+            outputFormat: Audio.AndroidOutputFormat.MPEG_4,
+            audioEncoder: Audio.AndroidAudioEncoder.AAC,
+            sampleRate: 44100,
+            numberOfChannels: 1,
+            bitRate: 128000,
+          },
+          ios: {
+            extension: '.m4a',
+            outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
+            audioQuality: Audio.IOSAudioQuality.HIGH,
+            sampleRate: 44100,
+            numberOfChannels: 1,
+            bitRate: 128000,
+          },
+          web: {
+            mimeType: 'audio/webm',
+            bitsPerSecond: 128000,
+          },
+        };
+
+        await this.recording.prepareToRecordAsync(recordingOptions);
+        await this.recording.startAsync();
+      }
 
       this.isRunning = true;
       this.isPaused = false;
@@ -608,6 +717,12 @@ export class VideoSyncDetectorV2 {
       this.lastHitAt = 0;
       this.lastVideoPosition = 0;
       this.isFirstLoop = true;          // Allow baseline building during first loop
+
+      if (this.usingAudioStream) {
+        console.log('🎧 Listen Mode using ExpoPlayAudioStream for live audio capture');
+      } else {
+        console.log('🎙️ Listen Mode falling back to expo-av recorder');
+      }
 
       // Set up video event listener to detect 2-second gap
       const player = this.opts.videoPlayer;
@@ -655,6 +770,18 @@ export class VideoSyncDetectorV2 {
         this.recording = null;
       }
 
+      if (this.usingAudioStream && ExpoPlayAudioStream) {
+        try {
+          await ExpoPlayAudioStream.stopRecording();
+        } catch (stopError) {
+          if (this.opts.debugMode) {
+            console.warn('Failed to stop audio stream during cleanup:', stopError?.message ?? stopError);
+          }
+        }
+        this.audioStreamSubscription = null;
+        this.usingAudioStream = false;
+      }
+
       throw error;
     }
   }
@@ -668,6 +795,16 @@ export class VideoSyncDetectorV2 {
     this.isPaused = true;
     this.isListening = false;
 
+    if (this.usingAudioStream && ExpoPlayAudioStream && typeof ExpoPlayAudioStream.pauseRecording === 'function') {
+      try {
+        ExpoPlayAudioStream.pauseRecording();
+      } catch (error) {
+        if (this.opts.debugMode) {
+          console.warn('Failed to pause audio stream:', error?.message ?? error);
+        }
+      }
+    }
+
     if (this.opts.debugMode) {
       console.log('⏸️ Detector paused (recording continues)');
     }
@@ -680,6 +817,16 @@ export class VideoSyncDetectorV2 {
     if (!this.isRunning) return;
 
     this.isPaused = false;
+
+    if (this.usingAudioStream && ExpoPlayAudioStream && typeof ExpoPlayAudioStream.resumeRecording === 'function') {
+      try {
+        ExpoPlayAudioStream.resumeRecording();
+      } catch (error) {
+        if (this.opts.debugMode) {
+          console.warn('Failed to resume audio stream:', error?.message ?? error);
+        }
+      }
+    }
 
     if (this.opts.debugMode) {
       console.log('▶️ Detector resumed');
@@ -708,7 +855,17 @@ export class VideoSyncDetectorV2 {
         this.videoListener = null;
       }
 
-      // Stop recording
+      // Stop recording / stream
+      if (this.usingAudioStream && ExpoPlayAudioStream) {
+        try {
+          await ExpoPlayAudioStream.stopRecording();
+        } catch (error) {
+          console.warn('Error stopping audio stream:', error?.message ?? error);
+        }
+        this.audioStreamSubscription = null;
+        this.usingAudioStream = false;
+      }
+
       if (this.recording) {
         try {
           await this.recording.stopAndUnloadAsync();
@@ -728,6 +885,7 @@ export class VideoSyncDetectorV2 {
       this.isPaused = false;
       this.isListening = false;
       this.recording = null;
+      this.usingAudioStream = false;
     }
   }
 

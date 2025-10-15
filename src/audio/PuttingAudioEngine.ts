@@ -82,7 +82,7 @@ export class PuttingAudioEngine {
 
       for (let i = 0; i < this.poolSize; i++) {
         try {
-          const player = createAudioPlayer(source);
+          const player: any = createAudioPlayer(source);
 
           // Debug: Check what type of player we got
           if (i === 0) {

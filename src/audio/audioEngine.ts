@@ -8,12 +8,15 @@ import { loadSprite } from './spriteLoader';
 
 export type SpriteName = 'metronome' | 'tones' | 'wind';
 
+export type AudioMode = SpriteName;
+
 export type ClipEvent = {
   id: string;
   sprite: SpriteName;
   clip: string;         // key from sprite JSON
   tStartMs: number;     // absolute time to start
   gain?: number;        // 0..1 (linear), optional
+  gainDb?: number;      // optional dB adjustment (legacy support)
 };
 
 type ClipDef = { start: number; duration: number; gain?: number; loop?: boolean };
@@ -36,6 +39,7 @@ export class AudioEngine {
   private running = false;
   private destroyed = false;
   private debug = true; // Enable debug logging
+  private currentMode: AudioMode = 'metronome';
 
   // Tune per platform (can be made adaptive after latency calibration)
   private scheduleAheadMs = 140; // iOS 80–140; Android 140–220
@@ -96,7 +100,14 @@ export class AudioEngine {
   }
 
   enqueue(evt: ClipEvent) {
-    this.queue.push(evt);
+    let normalized = evt;
+    if (normalized.gain === undefined && normalized.gainDb !== undefined) {
+      normalized = {
+        ...normalized,
+        gain: clamp01(dbToLinear(normalized.gainDb)),
+      };
+    }
+    this.queue.push(normalized);
   }
 
   start() {
@@ -109,6 +120,7 @@ export class AudioEngine {
   stop() {
     this.log('Stopping audio engine');
     this.running = false;
+    this.clearQueue();
   }
 
   async destroy() {
@@ -194,8 +206,22 @@ export class AudioEngine {
       setTimeout(this.tick, 20);
     }
   };
+
+  clearQueue() {
+    this.log('Clearing queued clips');
+    this.queue = [];
+  }
+
+  setMode(mode: AudioMode) {
+    this.currentMode = mode;
+    this.log('Active audio mode:', mode);
+  }
 }
 
 function clamp01(x: number) {
   return Math.max(0, Math.min(1, x));
+}
+
+function dbToLinear(db: number) {
+  return Math.pow(10, db / 20);
 }
