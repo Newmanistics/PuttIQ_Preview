@@ -2,7 +2,7 @@ export default {
   expo: {
     name: "PuttIQ",
     slug: "PuttIQ2",
-    version: "1.0.1",
+    version: "1.0.2",
     orientation: "landscape",
     icon: "./assets/icons/iTunesArtwork@2x.png",
     userInterfaceStyle: "light",
@@ -16,7 +16,7 @@ export default {
       requireFullScreen: false,
       orientation: "landscape",
       bundleIdentifier: "com.puttiq.app",
-      buildNumber: "4",
+      buildNumber: "5",
       infoPlist: {
         UIBackgroundModes: ["audio"],
         NSMicrophoneUsageDescription: "PuttIQ needs microphone access to detect the timing of your putting strokes.",
@@ -31,6 +31,7 @@ export default {
       },
       package: "com.puttiq.app",
       edgeToEdgeEnabled: true,
+      versionCode: 5,
       orientation: "landscape",
       permissions: ["RECORD_AUDIO"]
     },
