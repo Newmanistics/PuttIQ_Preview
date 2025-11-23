@@ -16,12 +16,17 @@ import { Platform } from 'react-native';
 
 let ExpoPlayAudioStream = null;
 try {
+  console.log('🔧 Loading @cjblack/expo-audio-stream module...');
   const audioStreamModule = require('@cjblack/expo-audio-stream');
   ExpoPlayAudioStream = audioStreamModule?.ExpoPlayAudioStream ?? null;
+  console.log('✅ Audio stream module loaded successfully:', !!ExpoPlayAudioStream);
 } catch (error) {
-  if (typeof __DEV__ !== 'undefined' && __DEV__) {
-    console.log('Expo audio stream module unavailable:', error?.message ?? error);
-  }
+  console.log('⚠️ Expo audio stream module unavailable:', error?.message ?? error);
+  console.log('⚠️ Error details:', {
+    name: error?.name,
+    message: error?.message,
+    code: error?.code
+  });
 }
 
 export class VideoSyncDetectorV2 {
@@ -629,7 +634,9 @@ export class VideoSyncDetectorV2 {
       });
 
       // Request microphone permissions
+      console.log('🚀 [START] Step 2: Requesting microphone permissions...');
       const { granted } = await Audio.requestPermissionsAsync();
+      console.log('✅ [START] Step 2 complete - Permission granted:', granted);
       if (!granted) {
         throw new Error('Microphone permission denied');
       }
@@ -637,6 +644,15 @@ export class VideoSyncDetectorV2 {
       // Configure audio mode for recording (required by expo-av)
       // Note: This may override native audio session settings, so we compensate
       // by setting video player volume to maximum in the hook
+      console.log('🚀 [START] Step 3: Configuring audio mode...');
+      console.log('📱 Platform:', Platform.OS);
+      console.log('🎵 Applying audio settings:', {
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: false,
+        interruptionModeIOS: 'MixWithOthers'
+      });
+
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
@@ -645,11 +661,17 @@ export class VideoSyncDetectorV2 {
         interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
         shouldDuckAndroid: false,
       });
+      console.log('✅ [START] Step 3 complete - Audio mode configured successfully');
 
       this.usingAudioStream = false;
       this.recording = null;
 
+      console.log('🚀 [START] Step 4: Checking for ExpoPlayAudioStream module...');
+      console.log('ExpoPlayAudioStream available:', !!ExpoPlayAudioStream);
+      console.log('ExpoPlayAudioStream.startRecording available:', !!(ExpoPlayAudioStream && typeof ExpoPlayAudioStream.startRecording === 'function'));
+
       if (ExpoPlayAudioStream && typeof ExpoPlayAudioStream.startRecording === 'function') {
+        console.log('🚀 [START] Step 5: Using ExpoPlayAudioStream (native audio stream)');
         const streamConfig = {
           sampleRate: this.opts.sampleRate,
           channels: 1,
@@ -659,14 +681,19 @@ export class VideoSyncDetectorV2 {
             this.handleAudioStreamData(audioData);
           }
         };
+        console.log('📝 Stream config:', streamConfig);
 
         try {
+          console.log('🛑 Stopping any existing recording...');
           await ExpoPlayAudioStream.stopRecording();
+          console.log('✅ Existing recording stopped (if any)');
         } catch (e) {
-          // No-op if nothing to stop
+          console.log('ℹ️ No existing recording to stop:', e.message);
         }
 
+        console.log('🎤 Starting ExpoPlayAudioStream recording...');
         const result = await ExpoPlayAudioStream.startRecording(streamConfig);
+        console.log('✅ [START] Step 5 complete - ExpoPlayAudioStream started, result:', result);
         this.audioStreamSubscription = result?.subscription ?? null;
         this.usingAudioStream = true;
       } else {
@@ -705,6 +732,7 @@ export class VideoSyncDetectorV2 {
         await this.recording.startAsync();
       }
 
+      console.log('🚀 [START] Step 6: Initializing detector state...');
       this.isRunning = true;
       this.isPaused = false;
       this.startTime = performance.now();
@@ -717,6 +745,7 @@ export class VideoSyncDetectorV2 {
       this.lastHitAt = 0;
       this.lastVideoPosition = 0;
       this.isFirstLoop = true;          // Allow baseline building during first loop
+      console.log('✅ [START] Step 6 complete - Detector state initialized');
 
       if (this.usingAudioStream) {
         console.log('🎧 Listen Mode using ExpoPlayAudioStream for live audio capture');
@@ -725,7 +754,15 @@ export class VideoSyncDetectorV2 {
       }
 
       // Set up video event listener to detect 2-second gap
+      console.log('🚀 [START] Step 7: Setting up video event listener...');
       const player = this.opts.videoPlayer;
+      console.log('📹 Video player status:', {
+        exists: !!player,
+        duration: player?.duration,
+        currentTime: player?.currentTime,
+        isPlaying: player?.playing
+      });
+
       this.videoListener = player.addListener('playingChange', (event) => {
         const isVideoPlaying = event.isPlaying;
 
@@ -750,13 +787,19 @@ export class VideoSyncDetectorV2 {
 
         this.videoWasPlaying = isVideoPlaying;
       });
+      console.log('✅ [START] Step 7 complete - Video event listener attached');
 
       // Start monitoring
+      console.log('🚀 [START] Step 8: Starting position monitoring...');
       this.startPositionMonitoring();
+      console.log('✅ [START] Step 8 complete - Position monitoring started');
 
-      console.log('✅ VideoSyncDetectorV2 started and recording');
+      console.log('✅✅✅ VideoSyncDetectorV2 FULLY STARTED and recording!');
     } catch (error) {
-      console.error('Failed to start VideoSyncDetectorV2:', error);
+      console.error('❌ FATAL ERROR in VideoSyncDetectorV2.start():', error);
+      console.error('❌ Error stack:', error.stack);
+      console.error('❌ Error name:', error.name);
+      console.error('❌ Error message:', error.message);
       this.isRunning = false;
       this.isPaused = false;
 
