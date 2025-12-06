@@ -8,7 +8,8 @@
       "Bash(cat:*)",
       "Bash(npx patch-package:*)",
       "Bash(timeout 20 npx expo start --no-dev --minify)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(gem install:*)"
     ],
     "deny": [],
     "ask": []

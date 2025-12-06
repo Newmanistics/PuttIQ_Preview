@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, Image, Dimensions, Platform } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, Image, Dimensions, Platform, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { useVideoSyncDetector } from '../hooks/useVideoSyncDetector';
@@ -31,6 +31,9 @@ export default function HomeScreen({ user }) {
   const [hitPosition, setHitPosition] = useState(null); // Position of detected hit (0-1)
   const [hitFeedback, setHitFeedback] = useState(null); // Colored feedback bar data
   const [liveAudioLevel, setLiveAudioLevel] = useState(null); // Live audio level display
+
+  // Info modal state
+  const [showInfoModal, setShowInfoModal] = useState(false);
 
   // Video loading state
   const [videoLoading, setVideoLoading] = useState(true); // True when video is loading
@@ -649,7 +652,7 @@ export default function HomeScreen({ user }) {
             </View>
           </View>
 
-          {/* Listen Mode Toggle Button - Bottom Left */}
+          {/* Listen Mode Toggle Button - HIDDEN until detector mode is fixed
           <TouchableOpacity
             style={styles.listenModeButton}
             onPress={() => {
@@ -675,6 +678,70 @@ export default function HomeScreen({ user }) {
               />
             </View>
           </TouchableOpacity>
+          */}
+
+          {/* Info Button - Bottom Left */}
+          <TouchableOpacity
+            style={styles.infoButton}
+            onPress={() => setShowInfoModal(true)}
+            activeOpacity={0.8}
+          >
+            <View style={styles.infoCircle}>
+              <Text style={styles.infoIcon}>i</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Info Modal - Using View overlay instead of Modal to avoid iOS orientation crash */}
+          {showInfoModal && (
+            <TouchableWithoutFeedback onPress={() => setShowInfoModal(false)}>
+              <View style={styles.modalOverlay}>
+                <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+                  <View style={styles.modalContent}>
+                    <TouchableOpacity
+                      style={styles.modalCloseButton}
+                      onPress={() => setShowInfoModal(false)}
+                    >
+                      <Text style={styles.modalCloseText}>✕</Text>
+                    </TouchableOpacity>
+                    <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={true}>
+                      <Text style={styles.modalTitle}>Welcome to Putt IQ</Text>
+                      <Text style={styles.modalSubtitle}>Where a more consistent and fluid putting stroke awaits.</Text>
+
+                      <Text style={styles.modalQuestion}>Q. Why is tempo important in the putting stroke?</Text>
+
+                      <Text style={styles.modalHeading}>1. Promotes Consistency</Text>
+                      <Text style={styles.modalText}>A consistent tempo ensures that your stroke length and speed match up properly. That synchronisation leads to better putting performance.</Text>
+
+                      <Text style={styles.modalHeading}>2. Helps Control Distance (Speed Control)</Text>
+                      <Text style={styles.modalText}>When tempo stays the same, your only variable becomes the length of your stroke, making distance control far more reliable.</Text>
+
+                      <Text style={styles.modalHeading}>3. Improves Rhythm and Feel</Text>
+                      <Text style={styles.modalText}>A smooth, even tempo creates a natural rhythm that enhances your touch and feel.</Text>
+
+                      <Text style={styles.modalHeading}>4. Reduces Tension</Text>
+                      <Text style={styles.modalText}>A steady tempo keeps your muscles relaxed, particularly in the hands and forearms. Tension leads to jerky or decelerating strokes. A relaxed, rhythmic motion promotes a free-flowing stroke that repeats under pressure.</Text>
+
+                      <Text style={styles.modalQuestion}>Q. When do I pull the putter back and start the stroke?</Text>
+                      <Text style={styles.modalText}>A. The light bar displays when the putting stroke should be taking place. On all of the putting tones there's an audible beep that is the cue to start the stroke on the next beat.</Text>
+
+                      <Text style={styles.modalQuestion}>Q. Should my putting tempo be the same for long and short putts?</Text>
+                      <Text style={styles.modalText}>A. Yes. On short putts the putter should travel less distance in the same time, and on long putts more distance in the same time. Stroke length is the differentiating factor in putts of different lengths.</Text>
+
+                      <Text style={styles.modalQuestion}>Q. Why is the app defaulted to 76bpm?</Text>
+                      <Text style={styles.modalText}>A. 76bpm is tour average tempo. The app tempo ranges from 70-80 bpm.</Text>
+
+                      <Text style={styles.modalQuestion}>Q. What's a 2:1 putting ratio and how does the app help develop that in the putting stroke?</Text>
+                      <Text style={styles.modalText}>A. Top putters have a 2:1 tempo ratio, meaning that the backswing takes twice as long as the down swing. When putting, the backswing has two stationary points. The putter head starts from a stationary position at set up and is briefly stationary at the culmination of the backswing before beginning the downswing.</Text>
+                      <Text style={styles.modalText}>In the downswing the putter head is only stationary at one point, when the transition from backswing to downswing occurs. This coupled with the putter head accelerating caused by the putter head finishing the stroke ahead of the point of impact, leads to a 2:1 ratio.</Text>
+                      <Text style={styles.modalText}>The app helps lock in this 2:1 ratio as the stroke becomes more synchronised and consistent.</Text>
+
+                      <View style={{ height: 30 }} />
+                    </ScrollView>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          )}
         </View>
       </SafeAreaView>
     </ImageBackground>
@@ -855,6 +922,115 @@ const styles = StyleSheet.create({
   },
   listenModeIconImageActive: {
     tintColor: '#fff',
+  },
+  // Info Button Styles
+  infoButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    zIndex: 10,
+  },
+  infoCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderWidth: 2,
+    borderColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  infoIcon: {
+    fontSize: 22,
+    fontWeight: '600',
+    fontStyle: 'italic',
+    color: '#333',
+    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+  },
+  // Modal Styles (using View overlay instead of Modal to avoid iOS orientation crash)
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    zIndex: 1000,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    width: '95%',
+    height: '80%',
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 10,
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#eee',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  modalCloseText: {
+    fontSize: 18,
+    color: '#666',
+    fontWeight: '600',
+  },
+  modalScrollView: {
+    marginTop: 10,
+    flex: 1,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1a472a',
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+    fontStyle: 'italic',
+  },
+  modalQuestion: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1a472a',
+    marginTop: 15,
+    marginBottom: 10,
+  },
+  modalHeading: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#333',
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  modalText: {
+    fontSize: 14,
+    color: '#444',
+    lineHeight: 20,
+    marginBottom: 8,
   },
   positionIndicator: {
     position: 'absolute',

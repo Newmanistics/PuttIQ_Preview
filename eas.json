@@ -1,7 +1,6 @@
 {
   "cli": {
-    "version": ">= 3.0.0",
-    "appVersionSource": "remote"
+    "version": ">= 3.0.0"
   },
   "build": {
     "development": {
@@ -21,6 +20,7 @@
       }
     },
     "preview": {
+      "developmentClient": true,
       "distribution": "internal",
       "ios": {
         "resourceClass": "m-medium"
@@ -34,6 +34,7 @@
       }
     },
     "production": {
+      "distribution": "store",
       "ios": {
         "resourceClass": "m-medium"
       },
@@ -43,10 +44,15 @@
       "env": {
         "EXPO_NO_METRO_WORKSPACE_ROOT": "1",
         "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
-      }
+      },
+      "channel": "production"
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascAppId": "6754336535"
+      }
+    }
   }
 }

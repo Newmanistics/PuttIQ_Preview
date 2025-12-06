@@ -2,7 +2,7 @@ export default {
   expo: {
     name: "PuttIQ",
     slug: "PuttIQ2",
-    version: "1.0.2",
+    version: "2.1.0",
     orientation: "landscape",
     icon: "./assets/icons/iTunesArtwork@2x.png",
     userInterfaceStyle: "light",
@@ -11,12 +11,18 @@ export default {
       resizeMode: "contain",
       backgroundColor: "#000000"
     },
+    updates: {
+      url: "https://u.expo.dev/3be295d8-99c6-44b0-9ffa-c9a96e077e9b"
+    },
     ios: {
       supportsTablet: true,
       requireFullScreen: false,
       orientation: "landscape",
-      bundleIdentifier: "com.puttiq.app",
-      buildNumber: "5",
+      bundleIdentifier: "com.golfingiq.puttiq",
+      buildNumber: "34",
+      runtimeVersion: {
+        policy: "appVersion"
+      },
       infoPlist: {
         UIBackgroundModes: ["audio"],
         NSMicrophoneUsageDescription: "PuttIQ needs microphone access to detect the timing of your putting strokes.",
@@ -29,10 +35,11 @@ export default {
         foregroundImage: "./assets/Icon_nobackground.jpg",
         backgroundColor: "#000000"
       },
-      package: "com.puttiq.app",
+      package: "com.golfingiq.puttiq",
       edgeToEdgeEnabled: true,
       versionCode: 5,
       orientation: "landscape",
+      runtimeVersion: "1.0.0",
       permissions: ["RECORD_AUDIO"]
     },
     web: {
@@ -53,7 +60,7 @@ export default {
     ],
     extra: {
       eas: {
-        projectId: "dcfe898b-0b08-41b9-9fc6-0f035884bd61"
+        projectId: "3be295d8-99c6-44b0-9ffa-c9a96e077e9b"
       }
     }
   }

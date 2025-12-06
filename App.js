@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import { View, Image, Text, StyleSheet, LogBox } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { Asset } from 'expo-asset';
 import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
 import HomeScreen from './screens/HomeScreen';
 import { authenticateUser } from './services/auth';
+
+// Suppress expected warnings
+LogBox.ignoreLogs([
+  'Recording is not active', // Expected when stopping recording that doesn't exist
+]);
 
 export default function App() {
   const [user, setUser] = useState(null);

@@ -35,7 +35,7 @@ export class VideoSyncDetectorV2 {
     this.opts = {
       bpm: 70,                          // Beats per minute
       videoPlayer: null,                // Video player reference
-      sampleRate: 44100,                // Audio sample rate
+      sampleRate: Platform.OS === 'ios' ? 48000 : 44100,  // Audio sample rate (48kHz for iOS, 44.1kHz for Android)
       beatsInVideo: 4,                  // Number of beats in video (default 4)
 
       // Detection parameters
@@ -45,7 +45,8 @@ export class VideoSyncDetectorV2 {
 
       // Timing parameters
       targetPosition: null,             // Target position for perfect hit (null = auto-calculate as 87.5%)
-      audioLatencyMs: 0,                // Audio processing latency compensation (disabled by default)
+      audioLatencyMs: 100,              // Audio processing latency compensation (iOS typical: 50-150ms)
+      timingCompensationMs: 0,          // Additional manual timing adjustment (+ = shift earlier, - = shift later)
       listenDelayMs: 500,               // Delay after Beat 3 before listening starts (to avoid detecting Beat 3 tone)
       hitProcessingDelayMs: 50,         // Delay before processing hit (allows for accurate capture without affecting timing)
 
@@ -80,6 +81,7 @@ export class VideoSyncDetectorV2 {
     // Audio stream integration
     this.usingAudioStream = false;
     this.audioStreamSubscription = null;
+    this.recordingStartTime = 0;      // Track when recording starts to ignore initial noise
 
     // Loop detection
     this.lastVideoPosition = 0;         // Track position to detect loop restart
@@ -395,6 +397,12 @@ export class VideoSyncDetectorV2 {
 
     const now = performance.now();
 
+    // Ignore audio data for the first 50ms after recording starts to avoid detecting startup noise
+    const timeSinceRecordingStart = now - this.recordingStartTime;
+    if (timeSinceRecordingStart < 50) {
+      return; // Skip processing during startup period
+    }
+
     if (this.isInGap || this.isFirstLoop) {
       this.updateBaseline(meteringLinear);
     }
@@ -514,8 +522,14 @@ export class VideoSyncDetectorV2 {
       // Default target is Beat 4 center pass (0.75)
       const targetPos = this.opts.targetPosition ?? beatTiming.beat4Position;
 
-      // Calculate timing using CAPTURED position (not current position)
-      const timing = this.calculateTiming(hit.videoPosition);
+      // Apply timing compensation to captured position
+      const videoDuration = this.opts.videoPlayer?.duration || 0;
+      const totalCompensationMs = this.opts.audioLatencyMs + this.opts.timingCompensationMs;
+      const compensationRatio = videoDuration > 0 ? (totalCompensationMs / 1000) / videoDuration : 0;
+      const compensatedPosition = hit.videoPosition - compensationRatio;
+
+      // Calculate timing using COMPENSATED position (accounts for audio processing delay)
+      const timing = this.calculateTiming(compensatedPosition);
 
       const hitEvent = {
         timestamp: hit.captureTimestamp,
@@ -533,13 +547,15 @@ export class VideoSyncDetectorV2 {
         this.opts.onHitDetected(hitEvent);
       }
 
-      // Debug log
+      // Debug log with timing compensation details
       if (this.opts.debugMode) {
         console.log(`✅ HIT #${hit.hitNumber} PROCESSED (${(now - hit.captureTimestamp).toFixed(0)}ms after capture)`, {
           energy: hit.audioLevel.toFixed(6),
           baseline: hit.baseline.toFixed(6),
           ratio: hit.ratio.toFixed(0) + 'x',
-          position: (hit.videoPosition * 100).toFixed(1) + '%',
+          rawPosition: (hit.videoPosition * 100).toFixed(1) + '%',
+          compensatedPosition: (compensatedPosition * 100).toFixed(1) + '%',
+          compensationMs: totalCompensationMs.toFixed(0) + 'ms',
           target: (targetPos * 100).toFixed(1) + '%',
           beat3: (beatTiming.beat3Position * 100).toFixed(1) + '%',
           beat4: (beatTiming.beat4Position * 100).toFixed(1) + '%',
@@ -547,6 +563,15 @@ export class VideoSyncDetectorV2 {
           accuracy: (timing.accuracy * 100).toFixed(0) + '%'
         });
       }
+
+      // Always log timing calibration data (helps determine optimal compensation)
+      console.log('📊 Timing Calibration:', {
+        rawPos: (hit.videoPosition * 100).toFixed(1) + '%',
+        compensated: (compensatedPosition * 100).toFixed(1) + '%',
+        compensation: totalCompensationMs + 'ms',
+        error: timing.errorMs.toFixed(0) + 'ms',
+        timing: timing.errorMs < 0 ? 'Early' : 'Late'
+      });
     });
 
     // Remove processed hits from buffer
@@ -666,36 +691,54 @@ export class VideoSyncDetectorV2 {
       this.usingAudioStream = false;
       this.recording = null;
 
-      console.log('🚀 [START] Step 4: Checking for ExpoPlayAudioStream module...');
-      console.log('ExpoPlayAudioStream available:', !!ExpoPlayAudioStream);
-      console.log('ExpoPlayAudioStream.startRecording available:', !!(ExpoPlayAudioStream && typeof ExpoPlayAudioStream.startRecording === 'function'));
+      console.log('DEBUG-PUTTIQ: 🚀 [START] Step 4: Checking for ExpoPlayAudioStream module...');
+      console.log('DEBUG-PUTTIQ: Platform.OS:', Platform.OS);
+      console.log('DEBUG-PUTTIQ: ExpoPlayAudioStream available:', !!ExpoPlayAudioStream);
+      console.log('DEBUG-PUTTIQ: ExpoPlayAudioStream.startRecording available:', !!(ExpoPlayAudioStream && typeof ExpoPlayAudioStream.startRecording === 'function'));
 
       if (ExpoPlayAudioStream && typeof ExpoPlayAudioStream.startRecording === 'function') {
-        console.log('🚀 [START] Step 5: Using ExpoPlayAudioStream (native audio stream)');
+        console.log('DEBUG-PUTTIQ: 🚀 [START] Step 5: Using ExpoPlayAudioStream (native audio stream)');
+        console.log('DEBUG-PUTTIQ: 🔊 iOS Sample Rate (this.opts.sampleRate):', this.opts.sampleRate);
+        console.log('DEBUG-PUTTIQ: 🔊 Expected: 48000 Hz for iOS hardware compatibility');
+
         const streamConfig = {
           sampleRate: this.opts.sampleRate,
           channels: 1,
-          bitsPerChannel: 16,
+          bitsPerChannel: Platform.OS === 'ios' ? 32 : 16,  // iOS: 32-bit to match Float32 better, Android: 16-bit
           interval: 100,
           onAudioStream: (audioData) => {
             this.handleAudioStreamData(audioData);
           }
         };
-        console.log('📝 Stream config:', streamConfig);
+        console.log('DEBUG-PUTTIQ: 📝 Stream config:', JSON.stringify(streamConfig, null, 2));
+        console.log('DEBUG-PUTTIQ: 🔊 Using bits per channel:', streamConfig.bitsPerChannel, '(iOS needs 32-bit for compatibility with Float32 hardware)');
 
         try {
-          console.log('🛑 Stopping any existing recording...');
+          console.log('DEBUG-PUTTIQ: 🛑 Stopping any existing recording...');
           await ExpoPlayAudioStream.stopRecording();
-          console.log('✅ Existing recording stopped (if any)');
+          console.log('DEBUG-PUTTIQ: ✅ Existing recording stopped (if any)');
         } catch (e) {
-          console.log('ℹ️ No existing recording to stop:', e.message);
+          // Silently ignore "Recording is not active" error - it's expected on first start
+          if (this.opts.debugMode) {
+            console.log('DEBUG-PUTTIQ: ℹ️ No existing recording to stop:', e.message);
+          }
         }
 
-        console.log('🎤 Starting ExpoPlayAudioStream recording...');
-        const result = await ExpoPlayAudioStream.startRecording(streamConfig);
-        console.log('✅ [START] Step 5 complete - ExpoPlayAudioStream started, result:', result);
-        this.audioStreamSubscription = result?.subscription ?? null;
-        this.usingAudioStream = true;
+        console.log('DEBUG-PUTTIQ: 🎤 Starting ExpoPlayAudioStream recording...');
+        try {
+          const result = await ExpoPlayAudioStream.startRecording(streamConfig);
+          console.log('DEBUG-PUTTIQ: ✅ [START] Step 5 complete - ExpoPlayAudioStream started, result:', result);
+          this.recordingStartTime = performance.now(); // Track start time to ignore initial 50ms of noise
+          this.audioStreamSubscription = result?.subscription ?? null;
+          this.usingAudioStream = true;
+        } catch (recordingError) {
+          console.error('DEBUG-PUTTIQ: ❌ CRITICAL: ExpoPlayAudioStream.startRecording() failed!');
+          console.error('DEBUG-PUTTIQ: Error name:', recordingError.name);
+          console.error('DEBUG-PUTTIQ: Error message:', recordingError.message);
+          console.error('DEBUG-PUTTIQ: Error stack:', recordingError.stack);
+          console.error('DEBUG-PUTTIQ: Stream config that failed:', JSON.stringify(streamConfig, null, 2));
+          throw new Error(`DEBUG-PUTTIQ: iOS Audio Stream failed to start: ${recordingError.message}`);
+        }
       } else {
         if (Platform.OS === 'ios') {
           throw new Error('Listen Mode requires the Expo audio stream module on iOS builds.');
@@ -718,7 +761,7 @@ export class VideoSyncDetectorV2 {
             extension: '.m4a',
             outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
             audioQuality: Audio.IOSAudioQuality.HIGH,
-            sampleRate: 44100,
+            sampleRate: 48000,  // iOS native sample rate
             numberOfChannels: 1,
             bitRate: 128000,
           },
