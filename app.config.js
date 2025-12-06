@@ -19,7 +19,7 @@ export default {
       requireFullScreen: false,
       orientation: "landscape",
       bundleIdentifier: "com.golfingiq.puttiq",
-      buildNumber: "34",
+      buildNumber: "35",
       runtimeVersion: {
         policy: "appVersion"
       },

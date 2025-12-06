@@ -696,14 +696,25 @@ export default function HomeScreen({ user }) {
             <TouchableWithoutFeedback onPress={() => setShowInfoModal(false)}>
               <View style={styles.modalOverlay}>
                 <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
-                  <View style={styles.modalContent}>
+                  <View style={[
+                    styles.modalContent,
+                    {
+                      marginTop: Math.max(insets.top, 20),
+                      marginBottom: Math.max(insets.bottom, 20),
+                      marginHorizontal: 20,
+                    }
+                  ]}>
                     <TouchableOpacity
                       style={styles.modalCloseButton}
                       onPress={() => setShowInfoModal(false)}
                     >
                       <Text style={styles.modalCloseText}>✕</Text>
                     </TouchableOpacity>
-                    <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={true}>
+                    <ScrollView 
+                      style={styles.modalScrollView} 
+                      contentContainerStyle={styles.modalScrollContent}
+                      showsVerticalScrollIndicator={true}
+                    >
                       <Text style={styles.modalTitle}>Welcome to Putt IQ</Text>
                       <Text style={styles.modalSubtitle}>Where a more consistent and fluid putting stroke awaits.</Text>
 
@@ -734,8 +745,6 @@ export default function HomeScreen({ user }) {
                       <Text style={styles.modalText}>A. Top putters have a 2:1 tempo ratio, meaning that the backswing takes twice as long as the down swing. When putting, the backswing has two stationary points. The putter head starts from a stationary position at set up and is briefly stationary at the culmination of the backswing before beginning the downswing.</Text>
                       <Text style={styles.modalText}>In the downswing the putter head is only stationary at one point, when the transition from backswing to downswing occurs. This coupled with the putter head accelerating caused by the putter head finishing the stroke ahead of the point of impact, leads to a 2:1 ratio.</Text>
                       <Text style={styles.modalText}>The app helps lock in this 2:1 ratio as the stroke becomes more synchronised and consistent.</Text>
-
-                      <View style={{ height: 30 }} />
                     </ScrollView>
                   </View>
                 </TouchableWithoutFeedback>
@@ -962,15 +971,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
     zIndex: 1000,
   },
   modalContent: {
     backgroundColor: '#fff',
     borderRadius: 16,
-    width: '95%',
-    height: '80%',
-    padding: 20,
+    maxWidth: 600,
+    maxHeight: '85%',
+    flexDirection: 'column',
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -995,8 +1006,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   modalScrollView: {
-    marginTop: 10,
     flex: 1,
+  },
+  modalScrollContent: {
+    paddingBottom: 20,
   },
   modalTitle: {
     fontSize: 24,
