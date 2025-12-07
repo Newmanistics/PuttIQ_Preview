@@ -2,7 +2,7 @@ export default {
   expo: {
     name: "PuttIQ",
     slug: "PuttIQ2",
-    version: "2.1.0",
+    version: "2.1.1",
     orientation: "landscape",
     icon: "./assets/icons/iTunesArtwork@2x.png",
     userInterfaceStyle: "light",
@@ -19,7 +19,7 @@ export default {
       requireFullScreen: false,
       orientation: "landscape",
       bundleIdentifier: "com.golfingiq.puttiq",
-      buildNumber: "35",
+      buildNumber: "36",
       runtimeVersion: {
         policy: "appVersion"
       },

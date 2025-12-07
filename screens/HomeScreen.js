@@ -695,7 +695,7 @@ export default function HomeScreen({ user }) {
           {showInfoModal && (
             <TouchableWithoutFeedback onPress={() => setShowInfoModal(false)}>
               <View style={styles.modalOverlay}>
-                <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+                <TouchableWithoutFeedback onPress={() => {}}>
                   <View style={[
                     styles.modalContent,
                     {
@@ -714,6 +714,10 @@ export default function HomeScreen({ user }) {
                       style={styles.modalScrollView} 
                       contentContainerStyle={styles.modalScrollContent}
                       showsVerticalScrollIndicator={true}
+                      scrollEnabled={true}
+                      nestedScrollEnabled={true}
+                      bounces={true}
+                      alwaysBounceVertical={false}
                     >
                       <Text style={styles.modalTitle}>Welcome to Putt IQ</Text>
                       <Text style={styles.modalSubtitle}>Where a more consistent and fluid putting stroke awaits.</Text>
@@ -745,6 +749,10 @@ export default function HomeScreen({ user }) {
                       <Text style={styles.modalText}>A. Top putters have a 2:1 tempo ratio, meaning that the backswing takes twice as long as the down swing. When putting, the backswing has two stationary points. The putter head starts from a stationary position at set up and is briefly stationary at the culmination of the backswing before beginning the downswing.</Text>
                       <Text style={styles.modalText}>In the downswing the putter head is only stationary at one point, when the transition from backswing to downswing occurs. This coupled with the putter head accelerating caused by the putter head finishing the stroke ahead of the point of impact, leads to a 2:1 ratio.</Text>
                       <Text style={styles.modalText}>The app helps lock in this 2:1 ratio as the stroke becomes more synchronised and consistent.</Text>
+
+                      <Text style={styles.modalQuestion}>Q. What's the lightning bolt mode and how does it work?</Text>
+                      <Text style={styles.modalText}>A. After practicing your putting stroke to tempo you can test yourself using 'strike mode'. Strike mode cuts off the last beat of the audio and measures your stroke. Your strike will be displayed in the light bar.</Text>
+                      <Text style={styles.modalText}>With a perfect stroke the strike will be displayed in the middle, directly above the golf ball. If your stroke is too quick your strike will be displayed to the right of the ball, and if too slow to the left.</Text>
                     </ScrollView>
                   </View>
                 </TouchableWithoutFeedback>
@@ -978,6 +986,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     maxWidth: 600,
     maxHeight: '85%',
+    height: '85%',
     flexDirection: 'column',
     paddingTop: 50,
     paddingHorizontal: 20,
