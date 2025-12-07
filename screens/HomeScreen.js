@@ -693,32 +693,35 @@ export default function HomeScreen({ user }) {
 
           {/* Info Modal - Using View overlay instead of Modal to avoid iOS orientation crash */}
           {showInfoModal && (
-            <TouchableWithoutFeedback onPress={() => setShowInfoModal(false)}>
-              <View style={styles.modalOverlay}>
-                <TouchableWithoutFeedback onPress={() => {}}>
-                  <View style={[
-                    styles.modalContent,
-                    {
-                      marginTop: Math.max(insets.top, 20),
-                      marginBottom: Math.max(insets.bottom, 20),
-                      marginHorizontal: 20,
-                    }
-                  ]}>
-                    <TouchableOpacity
-                      style={styles.modalCloseButton}
-                      onPress={() => setShowInfoModal(false)}
-                    >
-                      <Text style={styles.modalCloseText}>✕</Text>
-                    </TouchableOpacity>
-                    <ScrollView 
-                      style={styles.modalScrollView} 
-                      contentContainerStyle={styles.modalScrollContent}
-                      showsVerticalScrollIndicator={true}
-                      scrollEnabled={true}
-                      nestedScrollEnabled={true}
-                      bounces={true}
-                      alwaysBounceVertical={false}
-                    >
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback onPress={() => setShowInfoModal(false)}>
+                <View style={styles.modalOverlayTouchable} />
+              </TouchableWithoutFeedback>
+              <View 
+                style={[
+                  styles.modalContent,
+                  {
+                    marginTop: Math.max(insets.top, 20),
+                    marginBottom: Math.max(insets.bottom, 20),
+                    marginHorizontal: 20,
+                  }
+                ]}
+              >
+                <TouchableOpacity
+                  style={styles.modalCloseButton}
+                  onPress={() => setShowInfoModal(false)}
+                >
+                  <Text style={styles.modalCloseText}>✕</Text>
+                </TouchableOpacity>
+                <ScrollView 
+                  style={styles.modalScrollView} 
+                  contentContainerStyle={styles.modalScrollContent}
+                  showsVerticalScrollIndicator={true}
+                  scrollEnabled={true}
+                  nestedScrollEnabled={true}
+                  bounces={true}
+                  alwaysBounceVertical={false}
+                >
                       <Text style={styles.modalTitle}>Welcome to Putt IQ</Text>
                       <Text style={styles.modalSubtitle}>Where a more consistent and fluid putting stroke awaits.</Text>
 
@@ -754,10 +757,8 @@ export default function HomeScreen({ user }) {
                       <Text style={styles.modalText}>A. After practicing your putting stroke to tempo you can test yourself using 'strike mode'. Strike mode cuts off the last beat of the audio and measures your stroke. Your strike will be displayed in the light bar.</Text>
                       <Text style={styles.modalText}>With a perfect stroke the strike will be displayed in the middle, directly above the golf ball. If your stroke is too quick your strike will be displayed to the right of the ball, and if too slow to the left.</Text>
                     </ScrollView>
-                  </View>
-                </TouchableWithoutFeedback>
               </View>
-            </TouchableWithoutFeedback>
+            </View>
           )}
         </View>
       </SafeAreaView>
@@ -981,6 +982,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1000,
   },
+  modalOverlayTouchable: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1000,
+  },
   modalContent: {
     backgroundColor: '#fff',
     borderRadius: 16,
@@ -996,6 +1005,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 10,
+    zIndex: 1001,
   },
   modalCloseButton: {
     position: 'absolute',
